@@ -26,7 +26,6 @@ export const addProduct = async (req, res) => {
       message: "Product added successfully",
       product,
     });
-
   } catch (error) {
     console.error(error);
 
@@ -37,8 +36,6 @@ export const addProduct = async (req, res) => {
   }
 };
 
-
-// Get All Products
 // Get All Products
 export const getProducts = async (req, res) => {
   try {
@@ -66,7 +63,6 @@ export const getProducts = async (req, res) => {
       success: true,
       products,
     });
-
   } catch (error) {
     console.error(error);
 
@@ -96,7 +92,6 @@ export const getProductById = async (req, res) => {
       success: true,
       product,
     });
-
   } catch (error) {
     console.error(error);
 
@@ -106,6 +101,7 @@ export const getProductById = async (req, res) => {
     });
   }
 };
+
 // Update Product
 export const updateProduct = async (req, res) => {
   try {
@@ -117,8 +113,12 @@ export const updateProduct = async (req, res) => {
       updateData.image = req.file.path;
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.id,
+    // Only allow the shop owner who owns this product to update it
+    const updatedProduct = await Product.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        shopOwner: req.user.id,
+      },
       updateData,
       {
         new: true,
@@ -129,7 +129,7 @@ export const updateProduct = async (req, res) => {
     if (!updatedProduct) {
       return res.status(404).json({
         success: false,
-        message: "Product not found",
+        message: "Product not found or you are not authorized to update it",
       });
     }
 
@@ -138,7 +138,6 @@ export const updateProduct = async (req, res) => {
       message: "Product updated successfully",
       product: updatedProduct,
     });
-
   } catch (error) {
     console.error(error);
 
@@ -149,16 +148,19 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-
 // Delete Product
 export const deleteProduct = async (req, res) => {
   try {
-    const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+    // Only allow the shop owner who owns this product to delete it
+    const deletedProduct = await Product.findOneAndDelete({
+      _id: req.params.id,
+      shopOwner: req.user.id,
+    });
 
     if (!deletedProduct) {
       return res.status(404).json({
         success: false,
-        message: "Product not found",
+        message: "Product not found or you are not authorized to delete it",
       });
     }
 
@@ -166,7 +168,6 @@ export const deleteProduct = async (req, res) => {
       success: true,
       message: "Product deleted successfully",
     });
-
   } catch (error) {
     console.error(error);
 
@@ -176,6 +177,7 @@ export const deleteProduct = async (req, res) => {
     });
   }
 };
+
 // Get My Products
 export const getMyProducts = async (req, res) => {
   try {
@@ -187,7 +189,6 @@ export const getMyProducts = async (req, res) => {
       success: true,
       products,
     });
-
   } catch (error) {
     console.error(error);
 

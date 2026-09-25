@@ -42,6 +42,11 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    deliveryPartnerStatus: {
+  type: String,
+  enum: ["none", "pending", "approved", "rejected"],
+  default: "none",
+},
   },
   {
     timestamps: true,

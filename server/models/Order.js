@@ -7,52 +7,112 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
     deliveryPartner: {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: "User",
-  default: null,
-},
-
-    items: [
-  {
-    product: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
-    },
-
-    quantity: Number,
-
-    shopOwner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      default: null,
     },
-  },
-],
+
+    items: [
+      {
+        product: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+
+        quantity: {
+          type: Number,
+          required: true,
+        },
+
+        shopOwner: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+      },
+    ],
 
     address: {
-      fullName: String,
-      phone: String,
-      house: String,
-      village: String,
-      pincode: String,
+      fullName: {
+        type: String,
+        required: true,
+      },
+
+      phone: {
+        type: String,
+        required: true,
+      },
+
+      house: {
+        type: String,
+        required: true,
+      },
+
+      village: {
+        type: String,
+        required: true,
+      },
+
+      pincode: {
+        type: String,
+        required: true,
+      },
+
+      landmark: {
+        type: String,
+        default: "",
+      },
     },
 
-    subtotal: Number,
+    subtotal: {
+      type: Number,
+      required: true,
+    },
 
-    deliveryCharge: Number,
+    deliveryCharge: {
+      type: Number,
+      required: true,
+      default: 20,
+    },
 
-    total: Number,
+    total: {
+      type: Number,
+      required: true,
+    },
+
+    // ==============================
+    // PAYMENT
+    // ==============================
+
+    paymentMethod: {
+      type: String,
+      enum: ["COD", "ONLINE"],
+      default: "COD",
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: ["Pending", "Paid", "Failed"],
+      default: "Pending",
+    },
+
+    // ==============================
+    // ORDER STATUS
+    // ==============================
 
     status: {
       type: String,
       enum: [
-  "Pending",
-  "Accepted",
-  "Rejected",
-  "Preparing",
-  "Out for Delivery",
-  "Delivered",
-],
+        "Pending",
+        "Accepted",
+        "Rejected",
+        "Preparing",
+        "Out for Delivery",
+        "Delivered",
+      ],
       default: "Pending",
     },
   },
@@ -61,4 +121,6 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("Order", orderSchema);
+const Order = mongoose.model("Order", orderSchema);
+
+export default Order;

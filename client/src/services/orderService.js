@@ -1,5 +1,9 @@
 import api from "../api/axios";
 
+// ===============================
+// CUSTOMER - GET MY ORDERS
+// ===============================
+
 export const getMyOrders = async () => {
   const token = localStorage.getItem("token");
 
@@ -11,6 +15,59 @@ export const getMyOrders = async () => {
 
   return response.data;
 };
+
+// ===============================
+// CUSTOMER - PLACE ORDER
+// ===============================
+
+export const placeOrder = async (
+  address,
+  paymentMethod = "COD"
+) => {
+  const token = localStorage.getItem("token");
+
+  const response = await api.post(
+    "/orders",
+    {
+      address,
+      paymentMethod,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+// ===============================
+// CUSTOMER - MOCK ONLINE PAYMENT
+// ===============================
+
+export const processMockPayment = async (orderId) => {
+  const token = localStorage.getItem("token");
+
+  const response = await api.post(
+    "/orders/payment/mock",
+    {
+      orderId,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+// ===============================
+// SHOP OWNER - GET ORDERS
+// ===============================
+
 export const getShopOrders = async () => {
   const token = localStorage.getItem("token");
 
@@ -23,23 +80,14 @@ export const getShopOrders = async () => {
   return response.data;
 };
 
-export const placeOrder = async (address) => {
-  const token = localStorage.getItem("token");
+// ===============================
+// SHOP OWNER - UPDATE ORDER STATUS
+// ===============================
 
-  const response = await api.post(
-    "/orders",
-    { address },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-
-  return response.data;
-};
-
-export const updateOrderStatus = async (orderId, status) => {
+export const updateOrderStatus = async (
+  orderId,
+  status
+) => {
   const token = localStorage.getItem("token");
 
   const response = await api.put(
@@ -54,14 +102,22 @@ export const updateOrderStatus = async (orderId, status) => {
 
   return response.data;
 };
+
+// ===============================
+// SHOP OWNER - DASHBOARD
+// ===============================
+
 export const getShopDashboard = async () => {
   const token = localStorage.getItem("token");
 
-  const response = await api.get("/orders/shop-dashboard", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await api.get(
+    "/orders/shop-dashboard",
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
   return response.data;
 };

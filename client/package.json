@@ -16,9 +16,11 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1",
+    "recharts": "^3.10.1",
     "tailwindcss": "^4.3.2"
   },
   "devDependencies": {
+    "@rolldown/binding-win32-x64-msvc": "^1.1.4",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",

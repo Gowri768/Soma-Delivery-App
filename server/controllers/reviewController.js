@@ -75,3 +75,33 @@ export const addReview = async (req, res) => {
     });
   }
 };
+// ===============================
+// GET PRODUCT REVIEWS
+// ===============================
+
+export const getProductReviews = async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const reviews = await Review.find({
+      product: productId,
+    })
+      .populate("customer", "fullName")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      reviews,
+    });
+  } catch (error) {
+    console.error(
+      "Get product reviews error:",
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch reviews",
+    });
+  }
+};

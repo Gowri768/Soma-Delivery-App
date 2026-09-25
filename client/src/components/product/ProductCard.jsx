@@ -1,22 +1,25 @@
 import { useNavigate } from "react-router-dom";
 import Button from "../ui/Button";
 import { addToCart } from "../../services/cartService";
+
 function ProductCard({ product }) {
   const navigate = useNavigate();
+
   const handleAddToCart = async (e) => {
-  e.stopPropagation();
+    e.stopPropagation();
 
-  try {
-    const data = await addToCart(product._id, 1);
+    try {
+      await addToCart(product._id, 1);
+      window.dispatchEvent(new Event("cartUpdated"));
+      alert("✅ Product added to cart!");
+    } catch (error) {
+      alert(
+        error.response?.data?.message ||
+          "Failed to add product to cart"
+      );
+    }
+  };
 
-    alert("✅ Product added to cart!");
-  } catch (error) {
-    alert(
-      error.response?.data?.message ||
-      "Failed to add product to cart"
-    );
-  }
-};
   return (
     <div
       onClick={() => navigate(`/product/${product._id}`)}
@@ -62,18 +65,19 @@ function ProductCard({ product }) {
           onClick={(e) => e.stopPropagation()}
         >
           <Button
-  text="🛒 Add to Cart"
-  onClick={handleAddToCart}
-/>
-<button
-  onClick={(e) => {
-    e.stopPropagation();
-    navigate(`/product/${product._id}`);
-  }}
-  className="mt-3 w-full border border-orange-500 text-orange-500 py-3 rounded-xl hover:bg-orange-500 hover:text-white transition"
->
-  👁 View Details
-</button>
+            text="🛒 Add to Cart"
+            onClick={handleAddToCart}
+          />
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/product/${product._id}`);
+            }}
+            className="mt-3 w-full border border-orange-500 text-orange-500 py-3 rounded-xl hover:bg-orange-500 hover:text-white transition"
+          >
+            👁 View Details
+          </button>
         </div>
 
       </div>

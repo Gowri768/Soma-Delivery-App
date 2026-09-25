@@ -1,10 +1,42 @@
 import Cart from "../models/Cart.js";
+import Product from "../models/Product.js";
+
+// ===============================
+// CUSTOMER - ADD TO CART
+// ===============================
 
 export const addToCart = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
 
-    let cart = await Cart.findOne({ user: req.user.id });
+    const requestedQuantity = Number(quantity) || 1;
+
+    if (requestedQuantity < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Quantity must be at least 1",
+      });
+    }
+
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    if (product.stock <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Product is out of stock",
+      });
+    }
+
+    let cart = await Cart.findOne({
+      user: req.user.id,
+    });
 
     if (!cart) {
       cart = new Cart({
@@ -18,11 +50,28 @@ export const addToCart = async (req, res) => {
     );
 
     if (existingItem) {
-      existingItem.quantity += quantity || 1;
+      const newQuantity =
+        existingItem.quantity + requestedQuantity;
+
+      if (newQuantity > product.stock) {
+        return res.status(400).json({
+          success: false,
+          message: `Only ${product.stock} item(s) available in stock`,
+        });
+      }
+
+      existingItem.quantity = newQuantity;
     } else {
+      if (requestedQuantity > product.stock) {
+        return res.status(400).json({
+          success: false,
+          message: `Only ${product.stock} item(s) available in stock`,
+        });
+      }
+
       cart.items.push({
         product: productId,
-        quantity: quantity || 1,
+        quantity: requestedQuantity,
       });
     }
 
@@ -33,7 +82,6 @@ export const addToCart = async (req, res) => {
       message: "Product added to cart",
       cart,
     });
-
   } catch (error) {
     console.error(error);
 
@@ -43,6 +91,11 @@ export const addToCart = async (req, res) => {
     });
   }
 };
+
+// ===============================
+// CUSTOMER - GET CART
+// ===============================
+
 export const getCart = async (req, res) => {
   try {
     const cart = await Cart.findOne({
@@ -60,7 +113,6 @@ export const getCart = async (req, res) => {
       success: true,
       cart,
     });
-
   } catch (error) {
     console.error(error);
 
@@ -70,6 +122,10 @@ export const getCart = async (req, res) => {
     });
   }
 };
+
+// ===============================
+// CUSTOMER - UPDATE CART QUANTITY
+// ===============================
 
 export const updateCartQuantity = async (req, res) => {
   try {
@@ -97,12 +153,36 @@ export const updateCartQuantity = async (req, res) => {
       });
     }
 
+    // Increase quantity only if stock is available
     if (action === "increase") {
+      const product = await Product.findById(productId);
+
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found",
+        });
+      }
+
+      if (item.quantity + 1 > product.stock) {
+        return res.status(400).json({
+          success: false,
+          message: `Only ${product.stock} item(s) available in stock`,
+        });
+      }
+
       item.quantity += 1;
     }
 
     if (action === "decrease") {
       item.quantity -= 1;
+    }
+
+    if (!["increase", "decrease"].includes(action)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid cart action",
+      });
     }
 
     cart.items = cart.items.filter(
@@ -116,7 +196,6 @@ export const updateCartQuantity = async (req, res) => {
       message: "Cart updated",
       cart,
     });
-
   } catch (error) {
     console.error(error);
 
@@ -126,6 +205,10 @@ export const updateCartQuantity = async (req, res) => {
     });
   }
 };
+
+// ===============================
+// CUSTOMER - REMOVE FROM CART
+// ===============================
 
 export const removeFromCart = async (req, res) => {
   try {
@@ -153,7 +236,6 @@ export const removeFromCart = async (req, res) => {
       message: "Product removed from cart",
       cart,
     });
-
   } catch (error) {
     console.error(error);
 

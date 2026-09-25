@@ -29,15 +29,29 @@ function Login() {
       localStorage.setItem("token", data.token);
 
       // Save user details
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem(
+        "user",
+        JSON.stringify(data.user)
+      );
 
       setMessage(data.message);
 
-      // Redirect after login
-      navigate("/");
+      // Role-based redirect
+      if (data.user.role === "admin") {
+        navigate("/admin/dashboard");
+      } else if (data.user.role === "shopOwner") {
+        navigate("/shop/dashboard");
+      } else if (
+        data.user.role === "deliveryPartner"
+      ) {
+        navigate("/delivery/dashboard");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       setMessage(
-        error.response?.data?.message || "Login failed"
+        error.response?.data?.message ||
+          "Login failed"
       );
     }
   };
@@ -45,13 +59,14 @@ function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-xl shadow-md w-96">
-
         <h1 className="text-2xl font-bold text-center mb-6">
           Login
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4"
+        >
           <input
             type="email"
             name="email"
@@ -76,7 +91,6 @@ function Login() {
           >
             Login
           </button>
-
         </form>
 
         {message && (
@@ -84,7 +98,6 @@ function Login() {
             {message}
           </p>
         )}
-
       </div>
     </div>
   );

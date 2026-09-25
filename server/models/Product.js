@@ -37,15 +37,16 @@ const productSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    rating: {
-  type: Number,
-  default: 0,
-},
 
-numReviews: {
-  type: Number,
-  default: 0,
-},
+    rating: {
+      type: Number,
+      default: 0,
+    },
+
+    numReviews: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
