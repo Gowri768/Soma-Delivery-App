@@ -85,7 +85,7 @@ function Products() {
           </h1>
 
           <p className="text-gray-500 mt-1">
-            Manage all products available on Soma Delivery.
+            Manage all products available on Village Mart.
           </p>
         </div>
 

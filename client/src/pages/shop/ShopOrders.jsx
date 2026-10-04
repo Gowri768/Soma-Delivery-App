@@ -5,6 +5,7 @@ import {
   getShopOrders,
   updateOrderStatus,
 } from "../../services/orderService";
+import { formatUnitLabel } from "../../utils/unitUtils";
 
 function ShopOrders() {
   const [orders, setOrders] = useState([]);
@@ -114,7 +115,11 @@ function ShopOrders() {
                     </span>
 
                     <span>
-                      Qty: {item.quantity}
+                      Qty: {item.quantity}{" "}
+                      {formatUnitLabel(
+                        item.product?.unit,
+                        item.quantity
+                      )}
                     </span>
                   </div>
                 ))}

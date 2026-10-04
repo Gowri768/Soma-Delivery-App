@@ -5,7 +5,7 @@ function Sidebar() {
     <div className="w-64 min-h-screen bg-orange-700 text-white p-6">
 
       <h2 className="text-2xl font-bold mb-8">
-        Soma Delivery
+        Village Mart
       </h2>
 
       <nav className="flex flex-col gap-4">

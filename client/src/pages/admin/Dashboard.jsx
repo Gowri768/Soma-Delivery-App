@@ -123,7 +123,7 @@ function Dashboard() {
           </h1>
 
           <p className="text-gray-500 mt-1">
-            Overview of your Soma Delivery platform.
+            Overview of your Village Mart platform.
           </p>
         </div>
 

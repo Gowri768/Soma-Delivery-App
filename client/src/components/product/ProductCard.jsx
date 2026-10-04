@@ -1,6 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import Button from "../ui/Button";
 import { addToCart } from "../../services/cartService";
+import {
+  formatPriceWithUnit,
+  formatStock,
+} from "../../utils/unitUtils";
 
 function ProductCard({ product }) {
   const navigate = useNavigate();
@@ -48,14 +52,14 @@ function ProductCard({ product }) {
           🏪 {product.shopOwner?.fullName || "Local Shop"}
         </p>
 
-        <div className="flex justify-between items-center mt-5">
+        <div className="flex justify-between items-center mt-5 gap-2">
 
           <span className="text-2xl font-bold text-orange-500">
-            ₹{product.price}
+            {formatPriceWithUnit(product.price, product.unit)}
           </span>
 
-          <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm">
-            Stock: {product.stock}
+          <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm whitespace-nowrap">
+            {formatStock(product.stock, product.unit)}
           </span>
 
         </div>

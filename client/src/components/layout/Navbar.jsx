@@ -55,7 +55,7 @@ function Navbar() {
           to="/"
           className="text-3xl font-extrabold tracking-wide"
         >
-          🛒 Soma Delivery
+          🛒 Village Mart
         </Link>
 
         {/* Navigation */}

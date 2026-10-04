@@ -13,6 +13,7 @@ import {
 import DeliveryLayout from "../../components/layout/DeliveryLayout";
 import BackButton from "../../components/common/BackButton";
 import { getDeliveryHistory } from "../../services/deliveryService";
+import { formatUnitLabel } from "../../utils/unitUtils";
 
 function DeliveryHistory() {
   const [orders, setOrders] = useState([]);
@@ -242,7 +243,11 @@ function DeliveryHistory() {
                       >
                         <span className="text-gray-600">
                           {item.product?.name || "Product"} ×{" "}
-                          {item.quantity}
+                          {item.quantity}{" "}
+                          {formatUnitLabel(
+                            item.product?.unit,
+                            item.quantity
+                          )}
                         </span>
 
                         <span className="font-medium text-gray-700">

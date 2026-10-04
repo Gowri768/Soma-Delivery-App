@@ -54,12 +54,12 @@ function About() {
           <h1 className="text-5xl font-bold text-gray-800">
             About{" "}
             <span className="text-orange-500">
-              Soma Delivery
+              Village Mart
             </span>
           </h1>
 
           <p className="mt-6 text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed">
-            Soma Delivery is a modern grocery delivery platform
+            Village Mart is a modern grocery delivery platform
             that connects customers with local shops, making
             everyday shopping simple, convenient, and accessible.
           </p>

@@ -4,6 +4,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "migrate:units": "node scripts/migrateProductUnits.js",
+    "migrate:units:list": "node scripts/migrateProductUnits.js --list",
+    "migrate:units:dry": "node scripts/migrateProductUnits.js --dry-run",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },

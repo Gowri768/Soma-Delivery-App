@@ -40,7 +40,7 @@ app.use(
 
 // Test Route
 app.get("/", (req, res) => {
-  res.send("🚀 Soma Delivery Backend Running...");
+  res.send("🚀 Village Mart Backend Running...");
 });
 
 // Start Server

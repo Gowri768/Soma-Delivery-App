@@ -12,6 +12,10 @@ import {
   Plus,
 } from "lucide-react";
 import BackButton from "../../components/common/BackButton";
+import {
+  formatPriceWithUnit,
+  formatUnitLabel,
+} from "../../utils/unitUtils";
 
 function Cart() {
   const [cart, setCart] = useState(null);
@@ -105,11 +109,15 @@ function Cart() {
     );
   }
 
-  const subtotal = cart.items.reduce(
-    (total, item) =>
-      total + item.product.price * item.quantity,
-    0
-  );
+  const validItems = cart.items.filter(
+  (item) => item.product
+);
+
+const subtotal = validItems.reduce(
+  (total, item) =>
+    total + item.product.price * item.quantity,
+  0
+);
 
   const deliveryCharge = subtotal > 0 ? 20 : 0;
 
@@ -148,7 +156,7 @@ function Cart() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-5">
-            {cart.items.map((item) => (
+            {validItems.map((item) => (
               <div
                 key={item.product._id}
                 className="bg-white rounded-2xl shadow-sm p-5"
@@ -175,7 +183,10 @@ function Cart() {
                     </p>
 
                     <p className="text-orange-600 font-bold text-lg mt-3">
-                      ₹{item.product.price}
+                      {formatPriceWithUnit(
+                        item.product.price,
+                        item.product.unit
+                      )}
                     </p>
 
                     {/* Quantity */}
@@ -194,7 +205,11 @@ function Cart() {
                       </button>
 
                       <span className="font-bold min-w-6 text-center">
-                        {item.quantity}
+                        {item.quantity}{" "}
+                        {formatUnitLabel(
+                          item.product.unit,
+                          item.quantity
+                        )}
                       </span>
 
                       <button

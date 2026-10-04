@@ -4,22 +4,24 @@ import Product from "../models/Product.js";
 export const addProduct = async (req, res) => {
   try {
     const {
-      name,
-      description,
-      price,
-      category,
-      stock,
-    } = req.body;
+  name,
+  description,
+  price,
+  category,
+  stock,
+  unit,
+} = req.body;
 
-    const product = await Product.create({
-      name,
-      description,
-      price,
-      category,
-      stock,
-      image: req.file ? req.file.path : "",
-      shopOwner: req.user.id,
-    });
+  const product = await Product.create({
+  name,
+  description,
+  price,
+  category,
+  stock,
+  unit,
+  image: req.file ? req.file.path : "",
+  shopOwner: req.user.id,
+});
 
     res.status(201).json({
       success: true,
@@ -54,10 +56,8 @@ export const getProducts = async (req, res) => {
       filter.category = category;
     }
 
-    const products = await Product.find(filter).populate(
-      "shopOwner",
-      "fullName email"
-    );
+    const products = await Product.find(filter).populate("shopOwner", "fullName shopName email")
+    
 
     res.status(200).json({
       success: true,
@@ -105,20 +105,47 @@ export const getProductById = async (req, res) => {
 // Update Product
 export const updateProduct = async (req, res) => {
   try {
-    const updateData = {
-      ...req.body,
-    };
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    // Check authorization: shopOwner must match or user is admin, or claim if product is unowned
+    if (
+      req.user.role !== "admin" &&
+      product.shopOwner &&
+      product.shopOwner.toString() !== req.user.id
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to update this product",
+      });
+    }
+
+    const { name, description, price, category, stock, unit } = req.body;
+
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (description !== undefined) updateData.description = description;
+    if (price !== undefined && price !== "") updateData.price = Number(price);
+    if (category !== undefined) updateData.category = category;
+    if (stock !== undefined && stock !== "") updateData.stock = Number(stock);
+    if (unit !== undefined) updateData.unit = unit;
 
     if (req.file) {
       updateData.image = req.file.path;
     }
 
-    // Only allow the shop owner who owns this product to update it
-    const updatedProduct = await Product.findOneAndUpdate(
-      {
-        _id: req.params.id,
-        shopOwner: req.user.id,
-      },
+    if (!product.shopOwner) {
+      updateData.shopOwner = req.user.id;
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
       updateData,
       {
         new: true,
@@ -126,24 +153,17 @@ export const updateProduct = async (req, res) => {
       }
     );
 
-    if (!updatedProduct) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found or you are not authorized to update it",
-      });
-    }
-
     res.status(200).json({
       success: true,
       message: "Product updated successfully",
       product: updatedProduct,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Update Product Error:", error);
 
     res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: error.message || "Server Error",
     });
   }
 };
@@ -151,25 +171,34 @@ export const updateProduct = async (req, res) => {
 // Delete Product
 export const deleteProduct = async (req, res) => {
   try {
-    // Only allow the shop owner who owns this product to delete it
-    const deletedProduct = await Product.findOneAndDelete({
-      _id: req.params.id,
-      shopOwner: req.user.id,
-    });
+    const product = await Product.findById(req.params.id);
 
-    if (!deletedProduct) {
+    if (!product) {
       return res.status(404).json({
         success: false,
-        message: "Product not found or you are not authorized to delete it",
+        message: "Product not found",
       });
     }
+
+    if (
+      req.user.role !== "admin" &&
+      product.shopOwner &&
+      product.shopOwner.toString() !== req.user.id
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to delete this product",
+      });
+    }
+
+    await Product.findByIdAndDelete(req.params.id);
 
     res.status(200).json({
       success: true,
       message: "Product deleted successfully",
     });
   } catch (error) {
-    console.error(error);
+    console.error("Delete Product Error:", error);
 
     res.status(500).json({
       success: false,

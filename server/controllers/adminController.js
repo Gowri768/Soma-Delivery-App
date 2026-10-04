@@ -169,7 +169,7 @@ export const getAllOrders = async (req, res) => {
     const orders = await Order.find()
       .populate("customer", "fullName email phone")
       .populate("deliveryPartner", "fullName email phone")
-      .populate("items.product", "name price")
+      .populate("items.product", "name price unit")
       .populate("items.shopOwner", "fullName email")
       .sort({ createdAt: -1 });
 
@@ -343,7 +343,7 @@ export const updateAdminOrderStatus = async (req, res) => {
         "deliveryPartner",
         "fullName email phone"
       )
-      .populate("items.product", "name price")
+      .populate("items.product", "name price unit")
       .populate("items.shopOwner", "fullName email");
 
     res.status(200).json({
@@ -408,7 +408,7 @@ export const assignDeliveryPartner = async (req, res) => {
         "deliveryPartner",
         "fullName email phone"
       )
-      .populate("items.product", "name price")
+      .populate("items.product", "name price unit")
       .populate("items.shopOwner", "fullName email");
 
     res.status(200).json({

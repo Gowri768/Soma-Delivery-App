@@ -7,6 +7,11 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    shopName: {
+  type: String,
+  trim: true,
+  default: "",
+},
 
     email: {
       type: String,

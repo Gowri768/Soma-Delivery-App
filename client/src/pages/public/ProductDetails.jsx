@@ -18,6 +18,10 @@ import {
   Send,
   User,
 } from "lucide-react";
+import {
+  formatPriceWithUnit,
+  formatUnitLabel,
+} from "../../utils/unitUtils";
 
 function ProductDetails() {
   const { id } = useParams();
@@ -328,7 +332,7 @@ function ProductDetails() {
                 </p>
 
                 <p className="text-4xl font-bold text-orange-600">
-                  ₹{product.price}
+                  {formatPriceWithUnit(product.price, product.unit)}
                 </p>
               </div>
 
@@ -351,7 +355,9 @@ function ProductDetails() {
                   </span>
                 ) : (
                   <span className="font-semibold text-green-600">
-                    {product.stock} items available
+                    {product.stock}{" "}
+                    {formatUnitLabel(product.unit, product.stock)}{" "}
+                    available
                   </span>
                 )}
 

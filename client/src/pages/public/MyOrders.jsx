@@ -13,6 +13,7 @@ import {
 
 import api from "../../api/axios";
 import BackButton from "../../components/common/BackButton";
+import { formatUnitLabel } from "../../utils/unitUtils";
 
 function MyOrders() {
   const [orders, setOrders] = useState([]);
@@ -164,12 +165,15 @@ function MyOrders() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+
       {/* Header */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-6 py-8">
+
           <BackButton />
 
           <div className="flex items-center gap-3">
+
             <div className="bg-orange-100 p-3 rounded-xl">
               <Package
                 size={30}
@@ -186,16 +190,22 @@ function MyOrders() {
                 Track and view all your orders.
               </p>
             </div>
+
           </div>
+
         </div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 py-8">
+
         {/* Delivery Partner Application */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-8 border border-orange-100">
+
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+
             <div className="flex items-center gap-4">
+
               <div className="bg-orange-100 p-4 rounded-xl">
                 <Truck
                   size={30}
@@ -204,6 +214,7 @@ function MyOrders() {
               </div>
 
               <div>
+
                 <h2 className="text-xl font-bold text-gray-800">
                   Become a Delivery Partner
                 </h2>
@@ -218,20 +229,42 @@ function MyOrders() {
                     {applicationMessage}
                   </p>
                 )}
+
               </div>
+
             </div>
 
             {applicationStatus === "pending" ? (
+
               <div className="flex items-center gap-2 bg-yellow-100 text-yellow-700 px-5 py-3 rounded-xl font-semibold">
                 <CheckCircle size={18} />
                 Application Pending
               </div>
+
             ) : applicationStatus === "approved" ? (
+
               <div className="flex items-center gap-2 bg-green-100 text-green-700 px-5 py-3 rounded-xl font-semibold">
                 <CheckCircle size={18} />
                 Approved
               </div>
+
+            ) : applicationStatus === "rejected" ? (
+
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <div className="flex items-center gap-2 bg-red-100 text-red-700 px-5 py-3 rounded-xl font-semibold">
+                  Application Rejected
+                </div>
+                <button
+                  onClick={applyAsDeliveryPartner}
+                  disabled={applying}
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold transition disabled:opacity-50"
+                >
+                  {applying ? "Submitting..." : "Apply Again"}
+                </button>
+              </div>
+
             ) : (
+
               <button
                 onClick={applyAsDeliveryPartner}
                 disabled={applying}
@@ -241,13 +274,17 @@ function MyOrders() {
                   ? "Submitting..."
                   : "Apply Now"}
               </button>
+
             )}
+
           </div>
         </div>
 
         {/* Orders */}
         {orders.length === 0 ? (
+
           <div className="bg-white rounded-2xl shadow-lg p-10 text-center max-w-md mx-auto">
+
             <div className="flex justify-center mb-5">
               <div className="bg-orange-100 p-5 rounded-full">
                 <ShoppingBag
@@ -272,17 +309,25 @@ function MyOrders() {
             >
               Browse Products
             </a>
+
           </div>
+
         ) : (
+
           <div className="space-y-6">
+
             {orders.map((order) => (
+
               <div
                 key={order._id}
                 className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition"
               >
+
                 {/* Order Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+
                   <div>
+
                     <p className="text-sm text-gray-500">
                       Order ID
                     </p>
@@ -290,6 +335,7 @@ function MyOrders() {
                     <h2 className="font-bold text-gray-800 break-all">
                       #{order._id}
                     </h2>
+
                   </div>
 
                   <span
@@ -299,11 +345,14 @@ function MyOrders() {
                   >
                     {order.status}
                   </span>
+
                 </div>
 
                 {/* Order Information */}
                 <div className="grid sm:grid-cols-3 gap-4 border-t border-b py-5">
+
                   <div className="flex items-center gap-3">
+
                     <div className="bg-gray-100 p-2 rounded-lg">
                       <IndianRupee
                         size={18}
@@ -312,6 +361,7 @@ function MyOrders() {
                     </div>
 
                     <div>
+
                       <p className="text-xs text-gray-500">
                         Total Amount
                       </p>
@@ -319,10 +369,13 @@ function MyOrders() {
                       <p className="font-bold text-gray-800">
                         ₹{order.total}
                       </p>
+
                     </div>
+
                   </div>
 
                   <div className="flex items-center gap-3">
+
                     <div className="bg-gray-100 p-2 rounded-lg">
                       <CalendarDays
                         size={18}
@@ -331,6 +384,7 @@ function MyOrders() {
                     </div>
 
                     <div>
+
                       <p className="text-xs text-gray-500">
                         Ordered On
                       </p>
@@ -340,10 +394,13 @@ function MyOrders() {
                           order.createdAt
                         ).toLocaleDateString()}
                       </p>
+
                     </div>
+
                   </div>
 
                   <div className="flex items-center gap-3">
+
                     <div className="bg-gray-100 p-2 rounded-lg">
                       <Package
                         size={18}
@@ -352,6 +409,7 @@ function MyOrders() {
                     </div>
 
                     <div>
+
                       <p className="text-xs text-gray-500">
                         Items
                       </p>
@@ -362,20 +420,27 @@ function MyOrders() {
                           ? "item"
                           : "items"}
                       </p>
+
                     </div>
+
                   </div>
+
                 </div>
 
                 {/* Ordered Products */}
                 {order.items?.length > 0 && (
+
                   <div className="mt-5">
+
                     <h3 className="font-bold text-gray-800 mb-4">
                       Ordered Items
                     </h3>
 
                     <div className="space-y-3">
+
                       {order.items.map(
                         (item, index) => (
+
                           <div
                             key={
                               item.product?._id ||
@@ -383,8 +448,11 @@ function MyOrders() {
                             }
                             className="flex items-center justify-between gap-4 bg-gray-50 rounded-xl p-4"
                           >
+
                             <div className="flex items-center gap-4">
+
                               {item.product?.image ? (
+
                                 <img
                                   src={
                                     item.product.image
@@ -394,26 +462,36 @@ function MyOrders() {
                                   }
                                   className="w-16 h-16 rounded-lg object-cover"
                                 />
+
                               ) : (
+
                                 <div className="w-16 h-16 rounded-lg bg-orange-100 flex items-center justify-center">
                                   <Package
                                     size={24}
                                     className="text-orange-500"
                                   />
                                 </div>
+
                               )}
 
                               <div>
+
                                 <p className="font-semibold text-gray-800">
                                   {item.product?.name ||
                                     "Product"}
                                 </p>
 
+                                {/* Quantity + Unit */}
                                 <p className="text-sm text-gray-500">
-                                  Quantity:{" "}
-                                  {item.quantity}
+                                  Quantity: {item.quantity}{" "}
+                                  {formatUnitLabel(
+                                    item.product?.unit,
+                                    item.quantity
+                                  )}
                                 </p>
+
                               </div>
+
                             </div>
 
                             <p className="font-bold text-gray-800">
@@ -423,17 +501,28 @@ function MyOrders() {
                                   item.quantity
                                 : 0}
                             </p>
+
                           </div>
+
                         )
                       )}
+
                     </div>
+
                   </div>
+
                 )}
+
               </div>
+
             ))}
+
           </div>
+
         )}
+
       </div>
+
     </div>
   );
 }

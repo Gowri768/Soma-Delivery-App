@@ -9,7 +9,7 @@ function Footer() {
 
         <div>
           <h2 className="text-2xl font-bold text-orange-400">
-            🛒 Soma Delivery
+            🛒 Village Mart
           </h2>
 
           <p className="mt-4 text-gray-300">
@@ -70,7 +70,7 @@ function Footer() {
       </div>
 
       <div className="border-t border-gray-700 py-4 text-center text-gray-400">
-        © 2026 Soma Delivery. All Rights Reserved.
+        © 2026 Village Mart. All Rights Reserved.
       </div>
 
     </footer>

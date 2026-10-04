@@ -14,16 +14,22 @@ export const getProducts = async (search = "", category = "All") => {
 export const addProduct = async (productData) => {
   const token = localStorage.getItem("token");
 
-  const formData = new FormData();
+  let formData;
 
-  formData.append("name", productData.name);
-  formData.append("description", productData.description);
-  formData.append("price", productData.price);
-  formData.append("category", productData.category);
-  formData.append("stock", productData.stock);
+  if (productData instanceof FormData) {
+    formData = productData;
+  } else {
+    formData = new FormData();
+    formData.append("name", productData.name);
+    formData.append("description", productData.description);
+    formData.append("price", productData.price);
+    formData.append("category", productData.category);
+    formData.append("stock", productData.stock);
+    formData.append("unit", productData.unit || "piece");
 
-  if (productData.image) {
-    formData.append("image", productData.image);
+    if (productData.image) {
+      formData.append("image", productData.image);
+    }
   }
 
   const response = await api.post("/products", formData, {
@@ -55,14 +61,18 @@ export const getProductById = async (id) => {
 export const updateProduct = async (id, productData) => {
   const token = localStorage.getItem("token");
 
+  const headers = {
+    Authorization: `Bearer ${token}`,
+  };
+
+  if (productData instanceof FormData) {
+    headers["Content-Type"] = "multipart/form-data";
+  }
+
   const response = await api.put(
     `/products/${id}`,
     productData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+    { headers }
   );
 
   return response.data;

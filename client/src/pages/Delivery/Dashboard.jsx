@@ -16,12 +16,16 @@ import {
 } from "../../services/deliveryService";
 
 import DeliveryLayout from "../../components/layout/DeliveryLayout";
+import ConfirmModal from "../../components/common/ConfirmModal";
+import { formatUnitLabel } from "../../utils/unitUtils";
 
 function Dashboard() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingOrder, setUpdatingOrder] = useState(null);
   const [earnings, setEarnings] = useState(0);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [statusMessage, setStatusMessage] = useState("");
 
   useEffect(() => {
     fetchOrders();
@@ -55,26 +59,45 @@ function Dashboard() {
     }
   };
 
-  const handleStatusUpdate = async (orderId, status) => {
+  const requestStatusUpdate = (orderId, status) => {
+    const isDelivered = status === "Delivered";
+
+    setConfirmAction({
+      orderId,
+      status,
+      title: isDelivered ? "Mark as Delivered?" : "Start Delivery?",
+      message: isDelivered
+        ? "Confirm that this order has been delivered to the customer."
+        : "Mark this order as Out for Delivery?",
+      confirmLabel: isDelivered ? "Mark Delivered" : "Start Delivery",
+      confirmClassName: isDelivered
+        ? "bg-green-500 hover:bg-green-600"
+        : "bg-orange-500 hover:bg-orange-600",
+    });
+  };
+
+  const handleConfirmStatusUpdate = async () => {
+    if (!confirmAction) return;
+
+    const { orderId, status } = confirmAction;
+
     try {
       setUpdatingOrder(orderId);
+      setStatusMessage("");
 
-      const data = await updateDeliveryStatus(
-        orderId,
-        status
-      );
+      const data = await updateDeliveryStatus(orderId, status);
 
-      alert(data.message);
+      setStatusMessage(data.message || "Status updated successfully");
+      setConfirmAction(null);
 
       await fetchOrders();
-
-      // Refresh earnings after delivery status changes.
       await fetchEarnings();
     } catch (error) {
-      alert(
+      setStatusMessage(
         error.response?.data?.message ||
           "Failed to update delivery status"
       );
+      setConfirmAction(null);
     } finally {
       setUpdatingOrder(null);
     }
@@ -135,7 +158,7 @@ function Dashboard() {
       <div>
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
             Delivery Dashboard
           </h1>
 
@@ -144,10 +167,15 @@ function Dashboard() {
           </p>
         </div>
 
+        {statusMessage && (
+          <div className="mb-6 bg-orange-50 border border-orange-200 text-orange-800 px-4 py-3 rounded-xl text-sm">
+            {statusMessage}
+          </div>
+        )}
+
         {/* Statistics */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-          {/* Assigned */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 sm:gap-6 mb-8">
+          <div className="bg-white rounded-2xl shadow-sm p-5 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">
@@ -160,21 +188,15 @@ function Dashboard() {
               </div>
 
               <div className="bg-blue-100 p-3 rounded-xl">
-                <Package
-                  size={26}
-                  className="text-blue-600"
-                />
+                <Package size={26} className="text-blue-600" />
               </div>
             </div>
           </div>
 
-          {/* Pending */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
+          <div className="bg-white rounded-2xl shadow-sm p-5 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">
-                  Pending
-                </p>
+                <p className="text-gray-500 text-sm">Pending</p>
 
                 <h2 className="text-3xl font-bold text-gray-800 mt-2">
                   {pendingOrders}
@@ -182,16 +204,12 @@ function Dashboard() {
               </div>
 
               <div className="bg-purple-100 p-3 rounded-xl">
-                <Clock
-                  size={26}
-                  className="text-purple-600"
-                />
+                <Clock size={26} className="text-purple-600" />
               </div>
             </div>
           </div>
 
-          {/* Out for Delivery */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
+          <div className="bg-white rounded-2xl shadow-sm p-5 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">
@@ -204,21 +222,15 @@ function Dashboard() {
               </div>
 
               <div className="bg-orange-100 p-3 rounded-xl">
-                <Truck
-                  size={26}
-                  className="text-orange-600"
-                />
+                <Truck size={26} className="text-orange-600" />
               </div>
             </div>
           </div>
 
-          {/* Delivered */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
+          <div className="bg-white rounded-2xl shadow-sm p-5 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">
-                  Delivered
-                </p>
+                <p className="text-gray-500 text-sm">Delivered</p>
 
                 <h2 className="text-3xl font-bold text-gray-800 mt-2">
                   {deliveredOrders}
@@ -226,21 +238,15 @@ function Dashboard() {
               </div>
 
               <div className="bg-green-100 p-3 rounded-xl">
-                <CheckCircle
-                  size={26}
-                  className="text-green-600"
-                />
+                <CheckCircle size={26} className="text-green-600" />
               </div>
             </div>
           </div>
 
-          {/* Earnings */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
+          <div className="bg-white rounded-2xl shadow-sm p-5 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">
-                  Earnings
-                </p>
+                <p className="text-gray-500 text-sm">Earnings</p>
 
                 <h2 className="text-3xl font-bold text-gray-800 mt-2">
                   ₹{earnings}
@@ -248,17 +254,14 @@ function Dashboard() {
               </div>
 
               <div className="bg-green-100 p-3 rounded-xl">
-                <IndianRupee
-                  size={26}
-                  className="text-green-600"
-                />
+                <IndianRupee size={26} className="text-green-600" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Orders */}
-        <div className="bg-white rounded-2xl shadow-sm p-6">
+        <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-xl font-semibold text-gray-800">
@@ -273,10 +276,7 @@ function Dashboard() {
 
           {orders.length === 0 ? (
             <div className="text-center py-16">
-              <Truck
-                size={50}
-                className="mx-auto text-gray-300"
-              />
+              <Truck size={50} className="mx-auto text-gray-300" />
 
               <h3 className="text-lg font-semibold text-gray-700 mt-4">
                 No deliveries assigned
@@ -291,9 +291,8 @@ function Dashboard() {
               {orders.map((order) => (
                 <div
                   key={order._id}
-                  className="border rounded-2xl p-6 hover:shadow-sm transition"
+                  className="border border-gray-100 rounded-2xl p-4 sm:p-6 hover:shadow-sm transition"
                 >
-                  {/* Order Header */}
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
                     <div>
                       <p className="text-sm text-gray-500">
@@ -314,7 +313,6 @@ function Dashboard() {
                     </span>
                   </div>
 
-                  {/* Customer */}
                   <div className="grid md:grid-cols-2 gap-6 mb-6">
                     <div>
                       <h4 className="font-semibold text-gray-800 mb-2">
@@ -322,8 +320,7 @@ function Dashboard() {
                       </h4>
 
                       <p className="text-gray-700">
-                        {order.customer?.fullName ||
-                          "Customer"}
+                        {order.customer?.fullName || "Customer"}
                       </p>
 
                       <p className="text-sm text-gray-500">
@@ -335,7 +332,6 @@ function Dashboard() {
                       </p>
                     </div>
 
-                    {/* Address */}
                     <div>
                       <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                         <MapPin size={18} />
@@ -357,7 +353,6 @@ function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Items */}
                   <div className="border-t pt-5">
                     <h4 className="font-semibold text-gray-800 mb-3">
                       Order Items
@@ -369,28 +364,31 @@ function Dashboard() {
                           key={index}
                           className="flex items-center justify-between gap-4"
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
                             {item.product?.image && (
                               <img
                                 src={item.product.image}
                                 alt={item.product.name}
-                                className="w-12 h-12 object-cover rounded-lg"
+                                className="w-12 h-12 object-cover rounded-lg shrink-0"
                               />
                             )}
 
-                            <div>
-                              <p className="font-medium text-gray-800">
-                                {item.product?.name ||
-                                  "Product"}
+                            <div className="min-w-0">
+                              <p className="font-medium text-gray-800 truncate">
+                                {item.product?.name || "Product"}
                               </p>
 
                               <p className="text-sm text-gray-500">
-                                Quantity: {item.quantity}
+                                Quantity: {item.quantity}{" "}
+                                {formatUnitLabel(
+                                  item.product?.unit,
+                                  item.quantity
+                                )}
                               </p>
                             </div>
                           </div>
 
-                          <p className="font-medium text-gray-800">
+                          <p className="font-medium text-gray-800 shrink-0">
                             ₹
                             {(item.product?.price || 0) *
                               item.quantity}
@@ -400,7 +398,6 @@ function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Footer */}
                   <div className="border-t mt-5 pt-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                       <p className="text-sm text-gray-500">
@@ -412,19 +409,17 @@ function Dashboard() {
                       </p>
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-3">
                       {(order.status === "Accepted" ||
                         order.status === "Preparing") && (
                         <button
                           onClick={() =>
-                            handleStatusUpdate(
+                            requestStatusUpdate(
                               order._id,
                               "Out for Delivery"
                             )
                           }
-                          disabled={
-                            updatingOrder === order._id
-                          }
+                          disabled={updatingOrder === order._id}
                           className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-3 rounded-xl font-medium transition disabled:opacity-50"
                         >
                           {updatingOrder === order._id
@@ -436,14 +431,12 @@ function Dashboard() {
                       {order.status === "Out for Delivery" && (
                         <button
                           onClick={() =>
-                            handleStatusUpdate(
+                            requestStatusUpdate(
                               order._id,
                               "Delivered"
                             )
                           }
-                          disabled={
-                            updatingOrder === order._id
-                          }
+                          disabled={updatingOrder === order._id}
                           className="bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-xl font-medium transition disabled:opacity-50"
                         >
                           {updatingOrder === order._id
@@ -459,6 +452,19 @@ function Dashboard() {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        open={Boolean(confirmAction)}
+        title={confirmAction?.title || ""}
+        message={confirmAction?.message || ""}
+        confirmLabel={confirmAction?.confirmLabel}
+        confirmClassName={confirmAction?.confirmClassName}
+        loading={Boolean(updatingOrder)}
+        onConfirm={handleConfirmStatusUpdate}
+        onCancel={() => {
+          if (!updatingOrder) setConfirmAction(null);
+        }}
+      />
     </DeliveryLayout>
   );
 }

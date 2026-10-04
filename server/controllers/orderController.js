@@ -1,6 +1,7 @@
 import Order from "../models/Order.js";
 import Cart from "../models/Cart.js";
 import User from "../models/User.js";
+import { formatUnitLabel } from "../utils/unitUtils.js";
 
 // ===============================
 // CUSTOMER - PLACE ORDER
@@ -54,7 +55,10 @@ export const placeOrder = async (req, res) => {
       if (item.quantity > item.product.stock) {
         return res.status(400).json({
           success: false,
-          message: `Only ${item.product.stock} item(s) of "${item.product.name}" available in stock`,
+          message: `Only ${item.product.stock} ${formatUnitLabel(
+            item.product.unit,
+            item.product.stock
+          )} of "${item.product.name}" available in stock`,
         });
       }
 
@@ -383,10 +387,6 @@ export const updateOrderStatus = async (req, res) => {
     });
   }
 };
-
-// ===============================
-// SHOP OWNER - DASHBOARD
-// ===============================
 
 // ===============================
 // SHOP OWNER - DASHBOARD

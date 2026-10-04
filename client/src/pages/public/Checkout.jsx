@@ -223,7 +223,7 @@ function Checkout() {
                   </h2>
 
                   <p className="text-green-100 text-sm">
-                    Secure Soma Delivery Payment
+                    Secure Village Mart Payment
                   </p>
                 </div>
               </div>
@@ -261,7 +261,7 @@ function Checkout() {
 
                     <p className="text-sm text-blue-700 mt-1">
                       This is a simulated payment for
-                      the Soma Delivery project.
+                      the Village Mart project.
                       No real money will be charged.
                     </p>
                   </div>

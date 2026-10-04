@@ -33,6 +33,12 @@ const productSchema = new mongoose.Schema(
       default: 0,
     },
 
+    unit: {
+      type: String,
+      enum: ["kg", "g", "litre", "ml", "piece", "packet", "box"],
+      default: "piece",
+    },
+
     shopOwner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

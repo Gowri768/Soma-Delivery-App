@@ -19,7 +19,7 @@ function AdminTopbar() {
         </h2>
 
         <p className="text-xs text-gray-500">
-          Manage Soma Delivery
+          Manage Village Mart
         </p>
       </div>
 

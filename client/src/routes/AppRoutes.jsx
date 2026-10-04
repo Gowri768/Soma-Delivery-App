@@ -181,29 +181,29 @@ function AppRoutes() {
             }
           />
 
-          {/* =====================================================
-              DELIVERY PARTNER
-          ===================================================== */}
-
-          <Route
-            path="/delivery/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={["deliveryPartner"]}>
-                <DeliveryDashboard />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/delivery/history"
-            element={
-              <ProtectedRoute allowedRoles={["deliveryPartner"]}>
-                <DeliveryHistory />
-              </ProtectedRoute>
-            }
-          />
-
         </Route>
+
+        {/* =====================================================
+            DELIVERY PARTNER (own layout — not inside PublicLayout)
+        ===================================================== */}
+
+        <Route
+          path="/delivery/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["deliveryPartner"]}>
+              <DeliveryDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/delivery/history"
+          element={
+            <ProtectedRoute allowedRoles={["deliveryPartner"]}>
+              <DeliveryHistory />
+            </ProtectedRoute>
+          }
+        />
 
         {/* =====================================================
             ADMIN

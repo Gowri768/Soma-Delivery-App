@@ -1,39 +1,64 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ShopLayout from "../../components/layout/ShopLayout";
 import BackButton from "../../components/common/BackButton";
 import { addProduct } from "../../services/productService";
-import { PackagePlus } from "lucide-react";
 
 function AddProduct() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     price: "",
     category: "",
     stock: "",
-    image: null,
+    unit: "piece",
   });
 
-  const [message, setMessage] = useState("");
+  const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
+  // Handle text/select inputs
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
+  // Handle image
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
+  // Submit product
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setMessage("");
-    setLoading(true);
-
     try {
-      const data = await addProduct(formData);
+      setLoading(true);
+      setError("");
 
-      setMessage(data.message);
+      const data = new FormData();
+
+      data.append("name", formData.name);
+      data.append("description", formData.description);
+      data.append("price", formData.price);
+      data.append("category", formData.category);
+      data.append("stock", formData.stock);
+      data.append("unit", formData.unit);
+
+      if (image) {
+        data.append("image", image);
+      }
+
+      await addProduct(data);
+
+      alert("Product added successfully!");
 
       setFormData({
         name: "",
@@ -41,14 +66,17 @@ function AddProduct() {
         price: "",
         category: "",
         stock: "",
-        image: null,
+        unit: "piece",
       });
 
-      // Reset file input
-      document.getElementById("product-image").value = "";
-    } catch (error) {
-      setMessage(
-        error.response?.data?.message || "Failed to add product"
+      setImage(null);
+
+      navigate("/shop/my-products");
+    } catch (err) {
+      console.error(err);
+      setError(
+        err.response?.data?.message ||
+          "Failed to add product. Please try again."
       );
     } finally {
       setLoading(false);
@@ -57,40 +85,28 @@ function AddProduct() {
 
   return (
     <ShopLayout>
-      <div className="max-w-4xl mx-auto">
-        {/* Back Button */}
+      <div className="max-w-3xl mx-auto">
         <BackButton />
 
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3">
-            <div className="bg-orange-100 p-3 rounded-xl">
-              <PackagePlus
-                size={30}
-                className="text-orange-600"
-              />
+        <div className="bg-white rounded-2xl shadow-md p-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            Add New Product
+          </h1>
+
+          <p className="text-gray-500 mb-8">
+            Add a product to your shop
+          </p>
+
+          {error && (
+            <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-6">
+              {error}
             </div>
+          )}
 
-            <div>
-              <h1 className="text-4xl font-bold text-gray-800">
-                Add Product
-              </h1>
+          <form onSubmit={handleSubmit} className="space-y-6">
 
-              <p className="text-gray-500 mt-1">
-                Add a new product to your shop.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white rounded-2xl shadow-lg p-8"
-        >
-          <div className="grid md:grid-cols-2 gap-6">
             {/* Product Name */}
-            <div className="md:col-span-2">
+            <div>
               <label className="block font-semibold text-gray-700 mb-2">
                 Product Name
               </label>
@@ -107,7 +123,7 @@ function AddProduct() {
             </div>
 
             {/* Description */}
-            <div className="md:col-span-2">
+            <div>
               <label className="block font-semibold text-gray-700 mb-2">
                 Description
               </label>
@@ -117,9 +133,9 @@ function AddProduct() {
                 placeholder="Enter product description"
                 value={formData.description}
                 onChange={handleChange}
-                required
                 rows="4"
-                className="w-full border border-gray-300 p-3 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-orange-500"
+                required
+                className="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
 
@@ -136,24 +152,7 @@ function AddProduct() {
                 value={formData.price}
                 onChange={handleChange}
                 min="0"
-                required
-                className="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-
-            {/* Stock */}
-            <div>
-              <label className="block font-semibold text-gray-700 mb-2">
-                Stock
-              </label>
-
-              <input
-                type="number"
-                name="stock"
-                placeholder="Enter stock quantity"
-                value={formData.stock}
-                onChange={handleChange}
-                min="0"
+                step="0.01"
                 required
                 className="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
@@ -172,33 +171,57 @@ function AddProduct() {
                 required
                 className="w-full border border-gray-300 p-3 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-orange-500"
               >
-                <option value="">
-                  Select Category
-                </option>
+                <option value="">Select Category</option>
+                <option value="Groceries">Groceries</option>
+                <option value="Dairy">Dairy</option>
+                <option value="Vegetables">Vegetables</option>
+                <option value="Fruits">Fruits</option>
+                <option value="Snacks">Snacks</option>
+                <option value="Beverages">Beverages</option>
+                <option value="Household">Household</option>
+                <option value="Personal Care">Personal Care</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
 
-                <option value="Groceries">
-                  Groceries
-                </option>
+            {/* Stock */}
+            <div>
+              <label className="block font-semibold text-gray-700 mb-2">
+                Available Quantity
+              </label>
 
-                <option value="Vegetables">
-                  Vegetables
-                </option>
+              <input
+                type="number"
+                name="stock"
+                placeholder="Enter available quantity"
+                value={formData.stock}
+                onChange={handleChange}
+                min="0"
+                required
+                className="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
 
-                <option value="Fruits">
-                  Fruits
-                </option>
+            {/* Unit */}
+            <div>
+              <label className="block font-semibold text-gray-700 mb-2">
+                Unit (Selling Unit)
+              </label>
 
-                <option value="Dairy">
-                  Dairy
-                </option>
-
-                <option value="Medicines">
-                  Medicines
-                </option>
-
-                <option value="Household">
-                  Household
-                </option>
+              <select
+                name="unit"
+                value={formData.unit}
+                onChange={handleChange}
+                required
+                className="w-full border border-gray-300 p-3 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+              >
+                <option value="litre">Litre (L) - per litre</option>
+                <option value="kg">Kilogram (kg) - per kg</option>
+                <option value="g">Gram (g) - per gram</option>
+                <option value="ml">Millilitre (ml) - per ml</option>
+                <option value="piece">Piece - per piece</option>
+                <option value="packet">Packet - per packet</option>
+                <option value="box">Box - per box</option>
               </select>
             </div>
 
@@ -209,39 +232,24 @@ function AddProduct() {
               </label>
 
               <input
-                id="product-image"
                 type="file"
-                name="image"
                 accept="image/*"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    image: e.target.files[0],
-                  })
-                }
+                onChange={handleImageChange}
                 className="w-full border border-gray-300 p-3 rounded-xl bg-white"
               />
             </div>
-          </div>
 
-          {/* Submit */}
-          <div className="mt-8 flex justify-end">
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 text-white font-semibold px-8 py-3 rounded-xl transition"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition disabled:opacity-50"
             >
               {loading ? "Adding Product..." : "Add Product"}
             </button>
-          </div>
-        </form>
 
-        {/* Message */}
-        {message && (
-          <div className="mt-5 bg-orange-50 border border-orange-200 text-orange-700 p-4 rounded-xl">
-            {message}
-          </div>
-        )}
+          </form>
+        </div>
       </div>
     </ShopLayout>
   );

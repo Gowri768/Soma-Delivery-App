@@ -10,6 +10,10 @@ import {
 
 import { getProducts } from "../../services/productService";
 import { addToCart } from "../../services/cartService";
+import {
+  formatPriceWithUnit,
+  formatUnitLabel,
+} from "../../utils/unitUtils";
 
 function ShopDetails() {
   const { shopId } = useParams();
@@ -271,7 +275,7 @@ function ShopDetails() {
                   <div className="flex items-center justify-between mt-4">
 
                     <span className="text-xl font-bold text-orange-600">
-                      ₹{product.price}
+                      {formatPriceWithUnit(product.price, product.unit)}
                     </span>
 
                     <span
@@ -282,7 +286,7 @@ function ShopDetails() {
                       }`}
                     >
                       {product.stock > 0
-                        ? `${product.stock} left`
+                        ? `${product.stock} ${formatUnitLabel(product.unit, product.stock)} left`
                         : "Out of stock"}
                     </span>
 

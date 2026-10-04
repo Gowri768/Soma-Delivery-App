@@ -3,10 +3,10 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 export const register = async (req, res) => {
   try {
-    const { fullName, email, phone, password } = req.body;
+    const { fullName, shopName, email, phone, password } = req.body;
 
     // Validate required fields
-    if (!fullName || !email || !phone || !password) {
+    if (!fullName || !shopName || !email || !phone || !password) {
       return res.status(400).json({
         success: false,
         message: "All fields are required",
